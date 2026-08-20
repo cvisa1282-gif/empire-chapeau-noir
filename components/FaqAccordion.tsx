@@ -4,21 +4,20 @@ import { useState } from "react";
 
 const faqs = [
   {
-    // 👉 Remplace ces questions/réponses par tes vraies FAQ.
     q: "Comment se déroule l'accompagnement ?",
-    a: "Décris ici les grandes étapes de ton accompagnement ou de ta formation.",
+    a: "Tout commence par un échange direct sur WhatsApp après ta demande via le formulaire de contact. On fait le point sur ton objectif, puis je te guide étape par étape avec des méthodes concrètes, testées sur mes propres chaînes.",
   },
   {
     q: "Combien de temps faut-il pour voir des résultats ?",
-    a: "Donne un ordre d'idée réaliste basé sur ton expérience et celle de tes élèves.",
+    a: "Ça dépend de ton implication, mais avec les bonnes méthodes, les premiers résultats concrets (audience, revenus) arrivent généralement en quelques semaines à quelques mois de pratique régulière.",
   },
   {
     q: "Comment se passe le paiement ?",
-    a: "Explique la marche à suivre : remplir le formulaire de contact, échanger sur WhatsApp, puis modalités de paiement.",
+    a: "Il n'y a pas de paiement en ligne sur le site : tu remplis le formulaire de contact, on échange sur WhatsApp pour définir l'offre qui te correspond, et les modalités de paiement sont réglées directement avec moi.",
   },
   {
     q: "Y a-t-il des offres gratuites ?",
-    a: "Oui, certaines ressources et offres sont gratuites — retrouve-les sur la page Offres & Services.",
+    a: "Oui, certaines ressources et offres sont entièrement gratuites — retrouve-les sur la page Offres & Services, identifiées par un badge dédié.",
   },
 ];
 
