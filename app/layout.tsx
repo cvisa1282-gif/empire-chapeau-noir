@@ -5,6 +5,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import WhatsAppButton from "../components/WhatsAppButton";
 import CookieBanner from "../components/CookieBanner";
+import BackButton from "../components/BackButton";
 
 const display = Playfair_Display({
   subsets: ["latin"],
@@ -33,6 +34,7 @@ export default function RootLayout({
     <html lang="fr" className={`${display.variable} ${body.variable}`}>
       <body className="bg-paper-50 text-base-950 dark:bg-base-950 dark:text-paper-50 font-body antialiased">
         <Header />
+        <BackButton />
         <main>{children}</main>
         <Footer />
         <WhatsAppButton />
