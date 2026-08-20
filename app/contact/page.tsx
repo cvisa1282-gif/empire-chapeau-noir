@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import ContactForm from "../../components/ContactForm";
 
 export default function ContactPage() {
@@ -14,7 +15,9 @@ export default function ContactPage() {
         WhatsApp avec le message pré-rempli.
       </p>
 
-      <ContactForm />
+      <Suspense fallback={null}>
+        <ContactForm />
+      </Suspense>
     </section>
   );
 }

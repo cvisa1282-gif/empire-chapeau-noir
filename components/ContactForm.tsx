@@ -1,16 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { supabase } from "../lib/supabase";
 
 const number = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "22899314796";
 
 export default function ContactForm() {
+  const searchParams = useSearchParams();
+  const prefilledOffer = searchParams.get("offre") || "";
+
   const [form, setForm] = useState({
     fullName: "",
     phone: "",
     email: "",
-    offer: "",
+    offer: prefilledOffer,
     message: "",
   });
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");

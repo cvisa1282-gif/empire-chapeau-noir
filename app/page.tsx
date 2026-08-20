@@ -62,17 +62,21 @@ export default function HomePage() {
               Offre phare
             </span>
             <h3 className="mt-4 font-display text-2xl font-bold md:text-3xl">
-              [Nom de ton offre principale]
+              Formation Vidéos IA — Fruits
             </h3>
             <p className="mt-3 max-w-md text-sm opacity-75">
-              Décris ici ta formation/accompagnement principal — ce qu'elle
-              apporte concrètement, en une phrase forte.
+              La méthode complète (format PDF) que j&apos;utilise pour créer
+              mes vidéos de fruits générées par IA : outils, prompts,
+              astuces et étapes pour lancer et monétiser ta propre chaîne.
+            </p>
+            <p className="mt-4 font-display text-xl font-bold text-accent">
+              15 000 CFA
             </p>
             <Link
-              href="/offres"
+              href="/contact?offre=Formation%20Vid%C3%A9os%20IA%20%E2%80%94%20Fruits"
               className="mt-6 inline-block rounded-full bg-accent px-6 py-3 text-sm font-bold text-white"
             >
-              Découvrir l&apos;offre
+              Commander cette formation
             </Link>
           </div>
         </div>
