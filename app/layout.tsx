@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Manrope } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import WhatsAppButton from "@/components/WhatsAppButton";
-import CookieBanner from "@/components/CookieBanner";
+import Header from "../components/Header";
+import Footer from "../components/Footer";
+import WhatsAppButton from "../components/WhatsAppButton";
+import CookieBanner from "../components/CookieBanner";
 
 const display = Playfair_Display({
   subsets: ["latin"],

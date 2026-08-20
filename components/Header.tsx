@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import ThemeToggle from "@/components/ThemeToggle";
+import ThemeToggle from "./ThemeToggle";
 
 const links = [
   { href: "/offres", label: "Offres & Services" },

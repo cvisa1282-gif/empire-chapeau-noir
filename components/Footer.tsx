@@ -1,5 +1,5 @@
 import Link from "next/link";
-import NewsletterForm from "@/components/NewsletterForm";
+import NewsletterForm from "./NewsletterForm";
 
 export default function Footer() {
   return (

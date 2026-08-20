@@ -1,5 +1,5 @@
 import Link from "next/link";
-import TestimonialStrip from "@/components/TestimonialStrip";
+import TestimonialStrip from "../components/TestimonialStrip";
 
 export default function HomePage() {
   return (
