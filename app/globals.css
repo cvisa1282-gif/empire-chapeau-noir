@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------
+   SIGNATURE : le "sceau" — un badge circulaire tamponné,
+   utilisé pour l'offre phare et les résultats vérifiés.
+   Référence : tampon de certification / médaille de résultat,
+   en écho au ton "preuves à l'appui" des témoignages fournis.
+--------------------------------------------------------- */
+.seal {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  border: 2px dashed theme("colors.gold.DEFAULT");
+  padding: 0.35rem 0.9rem;
+  transform: rotate(-3deg);
+}
+
+.section-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    theme("colors.accent.DEFAULT") 50%,
+    transparent
+  );
+  opacity: 0.4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid theme("colors.accent.DEFAULT");
+  outline-offset: 2px;
+}
