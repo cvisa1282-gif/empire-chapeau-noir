@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Playfair_Display, Manrope } from "next/font/google";
 import "./globals.css";
 import Header from "../components/Header";
@@ -6,6 +7,7 @@ import Footer from "../components/Footer";
 import WhatsAppButton from "../components/WhatsAppButton";
 import CookieBanner from "../components/CookieBanner";
 import BackButton from "../components/BackButton";
+import ReferralTracker from "../components/ReferralTracker";
 
 const display = Playfair_Display({
   subsets: ["latin"],
@@ -49,6 +51,9 @@ export default function RootLayout({
       <body className="bg-paper-50 text-base-950 dark:bg-base-950 dark:text-paper-50 font-body antialiased">
         <Header />
         <BackButton />
+        <Suspense fallback={null}>
+          <ReferralTracker />
+        </Suspense>
         <main>{children}</main>
         <Footer />
         <WhatsAppButton />

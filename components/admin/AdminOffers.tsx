@@ -13,12 +13,14 @@ type Offer = {
   image_url: string | null;
   position: number | null;
   views: number | null;
+  price: number | null;
 };
 
 const emptyForm = {
   title: "",
   description: "",
   category: "",
+  price: "",
   is_free: false,
   featured: false,
 };
@@ -65,6 +67,7 @@ export default function AdminOffers() {
       title: form.title,
       description: form.description,
       category: form.category,
+      price: form.price ? Number(form.price) : null,
       is_free: form.is_free,
       featured: form.featured,
     };
@@ -90,6 +93,7 @@ export default function AdminOffers() {
       title: offer.title,
       description: offer.description || "",
       category: offer.category || "",
+      price: offer.price ? String(offer.price) : "",
       is_free: offer.is_free,
       featured: offer.featured,
     });
@@ -142,6 +146,14 @@ export default function AdminOffers() {
           onChange={(e) =>
             setForm((f) => ({ ...f, category: e.target.value }))
           }
+          className="w-full rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm dark:border-white/15"
+        />
+        <input
+          type="number"
+          min={0}
+          placeholder="Prix en CFA (utilisé pour calculer les commissions affiliés)"
+          value={form.price}
+          onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
           className="w-full rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm dark:border-white/15"
         />
         <input

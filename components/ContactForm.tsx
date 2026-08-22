@@ -38,6 +38,10 @@ export default function ContactForm() {
       email: form.email,
       offer_requested: form.offer,
       message: form.message,
+      referral_code:
+        typeof window !== "undefined"
+          ? localStorage.getItem("referral_code")
+          : null,
     });
 
     if (error) {

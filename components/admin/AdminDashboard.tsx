@@ -7,10 +7,12 @@ import AdminTestimonials from "./AdminTestimonials";
 import AdminBlog from "./AdminBlog";
 import AdminRequests from "./AdminRequests";
 import AdminNewsletterExport from "./AdminNewsletterExport";
+import AdminAffiliates from "./AdminAffiliates";
 
 const tabs = [
   { key: "requests", label: "Demandes" },
   { key: "offers", label: "Offres" },
+  { key: "affiliates", label: "Affiliés" },
   { key: "testimonials", label: "Témoignages" },
   { key: "blog", label: "Blog" },
   { key: "newsletter", label: "Newsletter" },
@@ -52,6 +54,7 @@ export default function AdminDashboard() {
       <div className="mt-6">
         {tab === "requests" && <AdminRequests />}
         {tab === "offers" && <AdminOffers />}
+        {tab === "affiliates" && <AdminAffiliates />}
         {tab === "testimonials" && <AdminTestimonials />}
         {tab === "blog" && <AdminBlog />}
         {tab === "newsletter" && <AdminNewsletterExport />}
