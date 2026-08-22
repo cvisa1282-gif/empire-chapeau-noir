@@ -1,7 +1,17 @@
 import Link from "next/link";
 import TestimonialStrip from "../components/TestimonialStrip";
+import { supabase } from "../lib/supabase";
 
-export default function HomePage() {
+export const revalidate = 0;
+
+export default async function HomePage() {
+  const { data: featured } = await supabase
+    .from("offers")
+    .select("*")
+    .eq("featured", true)
+    .limit(1)
+    .maybeSingle();
+
   return (
     <>
       {/* HERO */}
@@ -52,35 +62,33 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="section-divider mx-5" />
-
-      {/* OFFRE PHARE */}
-      <section className="px-5 py-16">
-        <div className="mx-auto flex max-w-6xl flex-col items-center gap-8 rounded-3xl bg-base-950 p-10 text-paper-50 md:flex-row md:p-14">
-          <div className="flex-1">
-            <span className="seal text-xs font-bold uppercase tracking-wide text-gold">
-              Offre phare
-            </span>
-            <h3 className="mt-4 font-display text-2xl font-bold md:text-3xl">
-              Formation Vidéos IA — Fruits
-            </h3>
-            <p className="mt-3 max-w-md text-sm opacity-75">
-              La méthode complète (format PDF) que j&apos;utilise pour créer
-              mes vidéos de fruits générées par IA : outils, prompts,
-              astuces et étapes pour lancer et monétiser ta propre chaîne.
-            </p>
-            <p className="mt-4 font-display text-xl font-bold text-accent">
-              15 000 CFA
-            </p>
-            <Link
-              href="/contact?offre=Formation%20Vid%C3%A9os%20IA%20%E2%80%94%20Fruits"
-              className="mt-6 inline-block rounded-full bg-accent px-6 py-3 text-sm font-bold text-white"
-            >
-              Commander cette formation
-            </Link>
-          </div>
-        </div>
-      </section>
+      {featured && (
+        <>
+          <div className="section-divider mx-5" />
+          {/* OFFRE PHARE (pilotée depuis /admin) */}
+          <section className="px-5 py-16">
+            <div className="mx-auto flex max-w-6xl flex-col items-center gap-8 rounded-3xl bg-base-950 p-10 text-paper-50 md:flex-row md:p-14">
+              <div className="flex-1">
+                <span className="seal text-xs font-bold uppercase tracking-wide text-gold">
+                  Offre phare
+                </span>
+                <h3 className="mt-4 font-display text-2xl font-bold md:text-3xl">
+                  {featured.title}
+                </h3>
+                <p className="mt-3 max-w-md text-sm opacity-75">
+                  {featured.description}
+                </p>
+                <Link
+                  href={`/contact?offre=${encodeURIComponent(featured.title)}`}
+                  className="mt-6 inline-block rounded-full bg-accent px-6 py-3 text-sm font-bold text-white"
+                >
+                  {featured.is_free ? "Recevoir gratuitement" : "Commander cette formation"}
+                </Link>
+              </div>
+            </div>
+          </section>
+        </>
+      )}
     </>
   );
 }

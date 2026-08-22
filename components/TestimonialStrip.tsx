@@ -1,24 +1,37 @@
-import Image from "next/image";
+import { supabase } from "../lib/supabase";
 
-// 👉 Pour ajouter un témoignage : dépose l'image dans /public,
-// puis ajoute une ligne ici. On passera sur Supabase Storage
-// plus tard pour que tu puisses gérer ça sans redéployer.
-const testimonials = [
-  { src: "/temoignage-1.jpg", alt: "Capture de résultats d'un élève" },
-  { src: "/temoignage-2.jpg", alt: "Capture de résultats d'un élève" },
-  { src: "/temoignage-3.jpg", alt: "Capture de résultats d'un élève" },
-  { src: "/temoignage-4.jpg", alt: "Capture de résultats d'un élève" },
-];
+export const revalidate = 0;
 
-export default function TestimonialStrip() {
+export default async function TestimonialStrip() {
+  const { data } = await supabase
+    .from("testimonials")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  const testimonials = data || [];
+
+  if (testimonials.length === 0) return null;
+
   return (
     <div className="mt-8 flex snap-x gap-4 overflow-x-auto pb-4">
-      {testimonials.map((t, i) => (
+      {testimonials.map((t) => (
         <div
-          key={i}
-          className="relative h-72 w-48 shrink-0 snap-start overflow-hidden rounded-2xl border border-black/10 shadow-sm dark:border-white/10"
+          key={t.id}
+          className="relative flex h-72 w-48 shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-black/10 shadow-sm dark:border-white/10"
         >
-          <Image src={t.src} alt={t.alt} fill className="object-cover" />
+          {t.image_url && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={t.image_url}
+              alt={t.author_name || "Témoignage"}
+              className="h-full w-full object-cover"
+            />
+          )}
+          {t.content && (
+            <p className="absolute bottom-0 bg-black/60 p-2 text-xs text-white">
+              {t.content}
+            </p>
+          )}
         </div>
       ))}
     </div>
