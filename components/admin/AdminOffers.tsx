@@ -12,6 +12,7 @@ type Offer = {
   featured: boolean;
   image_url: string | null;
   position: number | null;
+  views: number | null;
 };
 
 const emptyForm = {
@@ -229,6 +230,10 @@ export default function AdminOffers() {
               <p className="text-xs opacity-60">
                 {offer.is_free ? "Gratuit" : "Payant"}
                 {offer.category ? ` · ${offer.category}` : ""}
+                {" · "}
+                <span className="font-semibold text-accent">
+                  {offer.views || 0} vue{(offer.views || 0) > 1 ? "s" : ""}
+                </span>
               </p>
             </div>
             <button

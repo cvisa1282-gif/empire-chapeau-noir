@@ -1,6 +1,7 @@
 import { supabase } from "../../lib/supabase";
 import Link from "next/link";
 import type { Metadata } from "next";
+import OfferCta from "../../components/OfferCta";
 
 export const revalidate = 0;
 
@@ -67,12 +68,13 @@ export default async function OffresPage() {
               {offer.description}
             </p>
 
-            <Link
+            <OfferCta
+              offerId={offer.id}
               href={`/contact?offre=${encodeURIComponent(offer.title)}`}
               className="mt-5 rounded-full bg-accent px-5 py-2.5 text-center text-sm font-bold text-white"
             >
               {offer.is_free ? "Recevoir gratuitement" : "Commander"}
-            </Link>
+            </OfferCta>
           </div>
         ))}
 

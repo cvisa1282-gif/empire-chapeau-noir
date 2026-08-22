@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import TestimonialStrip from "../components/TestimonialStrip";
+import OfferCta from "../components/OfferCta";
 import { supabase } from "../lib/supabase";
 
 export const revalidate = 0;
@@ -85,12 +86,13 @@ export default async function HomePage() {
                 <p className="mt-3 max-w-md text-sm opacity-75">
                   {featured.description}
                 </p>
-                <Link
+                <OfferCta
+                  offerId={featured.id}
                   href={`/contact?offre=${encodeURIComponent(featured.title)}`}
                   className="mt-6 inline-block rounded-full bg-accent px-6 py-3 text-sm font-bold text-white"
                 >
                   {featured.is_free ? "Recevoir gratuitement" : "Commander cette formation"}
-                </Link>
+                </OfferCta>
               </div>
             </div>
           </section>

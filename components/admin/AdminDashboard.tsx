@@ -5,17 +5,21 @@ import { supabase } from "../../lib/supabase";
 import AdminOffers from "./AdminOffers";
 import AdminTestimonials from "./AdminTestimonials";
 import AdminBlog from "./AdminBlog";
+import AdminRequests from "./AdminRequests";
+import AdminNewsletterExport from "./AdminNewsletterExport";
 
 const tabs = [
+  { key: "requests", label: "Demandes" },
   { key: "offers", label: "Offres" },
   { key: "testimonials", label: "Témoignages" },
   { key: "blog", label: "Blog" },
+  { key: "newsletter", label: "Newsletter" },
 ] as const;
 
 type TabKey = (typeof tabs)[number]["key"];
 
 export default function AdminDashboard() {
-  const [tab, setTab] = useState<TabKey>("offers");
+  const [tab, setTab] = useState<TabKey>("requests");
 
   return (
     <div className="mx-auto max-w-4xl px-5 py-10">
@@ -29,7 +33,7 @@ export default function AdminDashboard() {
         </button>
       </div>
 
-      <div className="mt-6 flex gap-2 border-b border-black/10 dark:border-white/10">
+      <div className="mt-6 flex flex-wrap gap-2 border-b border-black/10 dark:border-white/10">
         {tabs.map((t) => (
           <button
             key={t.key}
@@ -46,9 +50,11 @@ export default function AdminDashboard() {
       </div>
 
       <div className="mt-6">
+        {tab === "requests" && <AdminRequests />}
         {tab === "offers" && <AdminOffers />}
         {tab === "testimonials" && <AdminTestimonials />}
         {tab === "blog" && <AdminBlog />}
+        {tab === "newsletter" && <AdminNewsletterExport />}
       </div>
     </div>
   );
