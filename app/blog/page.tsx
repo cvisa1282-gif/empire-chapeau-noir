@@ -1,7 +1,13 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { supabase } from "../../lib/supabase";
 
 export const revalidate = 0;
+
+export const metadata: Metadata = {
+  title: "Blog",
+  description: "Actualités et conseils pour créer et développer ton contenu.",
+};
 
 type Post = {
   id: string;

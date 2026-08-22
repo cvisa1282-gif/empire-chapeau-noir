@@ -1,19 +1,45 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { supabase } from "../../../lib/supabase";
 
 export const revalidate = 0;
+
+async function getPost(slug: string) {
+  const { data } = await supabase
+    .from("blog_posts")
+    .select("*")
+    .eq("slug", slug)
+    .eq("published", true)
+    .maybeSingle();
+  return data;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const post = await getPost(params.slug);
+  if (!post) return { title: "Article introuvable" };
+
+  return {
+    title: post.title,
+    description: post.excerpt || undefined,
+    openGraph: {
+      title: post.title,
+      description: post.excerpt || undefined,
+      images: post.cover_image_url ? [{ url: post.cover_image_url }] : undefined,
+      type: "article",
+    },
+  };
+}
 
 export default async function BlogPostPage({
   params,
 }: {
   params: { slug: string };
 }) {
-  const { data: post } = await supabase
-    .from("blog_posts")
-    .select("*")
-    .eq("slug", params.slug)
-    .eq("published", true)
-    .maybeSingle();
+  const post = await getPost(params.slug);
 
   if (!post) notFound();
 

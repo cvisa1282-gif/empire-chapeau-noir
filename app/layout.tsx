@@ -20,9 +20,23 @@ const body = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Empire Chapeau Noir",
+  metadataBase: new URL("https://empire-chapeau-noir.vercel.app"),
+  title: {
+    default: "Empire Chapeau Noir",
+    template: "%s — Empire Chapeau Noir",
+  },
   description:
     "Formation, accompagnement et création de contenu — Empire Chapeau Noir.",
+  openGraph: {
+    siteName: "Empire Chapeau Noir",
+    type: "website",
+    locale: "fr_FR",
+    images: [{ url: "/logo.png", width: 512, height: 512 }],
+  },
+  twitter: {
+    card: "summary",
+    images: ["/logo.png"],
+  },
 };
 
 export default function RootLayout({

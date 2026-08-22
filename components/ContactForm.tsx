@@ -17,7 +17,9 @@ export default function ContactForm() {
     offer: prefilledOffer,
     message: "",
   });
-  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "saveFailed"
+  >("idle");
 
   function update<K extends keyof typeof form>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -27,7 +29,9 @@ export default function ContactForm() {
     e.preventDefault();
     setStatus("loading");
 
-    // Enregistre la demande dans Supabase pour garder une trace
+    // Enregistre la demande dans Supabase pour garder une trace.
+    // Si ça échoue (ex: base indisponible), on continue quand même vers
+    // WhatsApp pour ne jamais perdre un contact potentiel.
     const { error } = await supabase.from("order_requests").insert({
       full_name: form.fullName,
       phone: form.phone,
@@ -37,8 +41,7 @@ export default function ContactForm() {
     });
 
     if (error) {
-      setStatus("error");
-      return;
+      setStatus("saveFailed");
     }
 
     // Construit le message WhatsApp pré-rempli
@@ -51,7 +54,7 @@ export default function ContactForm() {
     );
 
     window.open(`https://wa.me/${number}?text=${waText}`, "_blank");
-    setStatus("idle");
+    if (!error) setStatus("idle");
     setForm({ fullName: "", phone: "", email: "", offer: "", message: "" });
   }
 
@@ -124,10 +127,19 @@ export default function ContactForm() {
         {status === "loading" ? "Envoi..." : "Envoyer sur WhatsApp"}
       </button>
 
-      {status === "error" && (
-        <p className="text-xs text-red-500">
-          Une erreur est survenue, réessaie ou écris-moi directement sur
-          WhatsApp.
+      {status === "saveFailed" && (
+        <p className="text-xs text-amber-600">
+          Ta demande a bien été envoyée sur WhatsApp, mais elle n&apos;a pas
+          pu être sauvegardée automatiquement.{" "}
+          <a
+            href={`https://wa.me/${number}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
+          >
+            Ouvrir WhatsApp directement
+          </a>{" "}
+          si la conversation ne s&apos;est pas ouverte.
         </p>
       )}
     </form>

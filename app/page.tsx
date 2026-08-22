@@ -1,8 +1,15 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import TestimonialStrip from "../components/TestimonialStrip";
 import { supabase } from "../lib/supabase";
 
 export const revalidate = 0;
+
+export const metadata: Metadata = {
+  title: "Empire Chapeau Noir — Formation & création de contenu",
+  description:
+    "Formations, accompagnement et création de contenu pour lancer et faire grandir ton activité en ligne, étape par étape.",
+};
 
 export default async function HomePage() {
   const { data: featured } = await supabase
