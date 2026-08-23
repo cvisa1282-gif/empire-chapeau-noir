@@ -9,6 +9,8 @@ type Affiliate = {
   phone: string | null;
   code: string;
   commission_rate: number;
+  offer_slug: string | null;
+  active: boolean;
 };
 
 type AffiliateRequest = {
@@ -21,19 +23,36 @@ type AffiliateRequest = {
   created_at: string;
 };
 
-export default function AdminAffiliates() {
+function generatePassword() {
+  const chars =
+    "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789";
+  let pass = "";
+  for (let i = 0; i < 10; i++) {
+    pass += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return pass;
+}
+
+export default function AdminAffiliates({
+  onChange,
+}: {
+  onChange?: () => void;
+}) {
   const [affiliates, setAffiliates] = useState<Affiliate[]>([]);
   const [requests, setRequests] = useState<AffiliateRequest[]>([]);
+  const [salesTotals, setSalesTotals] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState("");
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
     phone: "",
     email: "",
     password: "",
     commissionRate: "20",
+    offerSlug: "",
   });
   const [prefillRequestId, setPrefillRequestId] = useState<string | null>(
     null
@@ -49,22 +68,61 @@ export default function AdminAffiliates() {
         .eq("status", "en_attente")
         .order("created_at", { ascending: false }),
     ]);
-    setAffiliates((aff.data as Affiliate[]) || []);
+    const affiliateList = (aff.data as Affiliate[]) || [];
+    setAffiliates(affiliateList);
     setRequests((req.data as AffiliateRequest[]) || []);
+
+    // Calcule le total des ventes confirmées par affilié
+    if (affiliateList.length > 0) {
+      const { data: offers } = await supabase.from("offers").select("title, price");
+      const priceMap: Record<string, number> = {};
+      (offers || []).forEach((o) => {
+        if (o.price) priceMap[o.title] = o.price;
+      });
+
+      const { data: confirmed } = await supabase
+        .from("order_requests")
+        .select("referral_code, offer_requested")
+        .eq("sale_confirmed", true);
+
+      const totals: Record<string, number> = {};
+      (confirmed || []).forEach((r) => {
+        if (!r.referral_code) return;
+        const price = r.offer_requested ? priceMap[r.offer_requested] || 0 : 0;
+        const aff = affiliateList.find((a) => a.code === r.referral_code);
+        const rate = aff ? aff.commission_rate : 0;
+        totals[r.referral_code] =
+          (totals[r.referral_code] || 0) + (price * rate) / 100;
+      });
+      setSalesTotals(totals);
+    }
+
     setLoading(false);
+    onChange?.();
   }
 
   useEffect(() => {
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function prefillFromRequest(r: AffiliateRequest) {
+  async function prefillFromRequest(r: AffiliateRequest) {
+    let offerSlug = "";
+    if (r.offer_title) {
+      const { data: offer } = await supabase
+        .from("offers")
+        .select("slug")
+        .eq("title", r.offer_title)
+        .maybeSingle();
+      offerSlug = offer?.slug || "";
+    }
     setForm({
       name: r.name,
       phone: r.phone || "",
       email: r.email,
-      password: "",
+      password: generatePassword(),
       commissionRate: "20",
+      offerSlug,
     });
     setPrefillRequestId(r.id);
     setResult("");
@@ -77,6 +135,21 @@ export default function AdminAffiliates() {
       .update({ status: "refuse" })
       .eq("id", id);
     load();
+  }
+
+  async function toggleActive(a: Affiliate) {
+    await supabase
+      .from("affiliates")
+      .update({ active: !a.active })
+      .eq("id", a.id);
+    load();
+  }
+
+  function linkFor(a: { code: string; offer_slug: string | null }) {
+    const base = "https://empire-chapeau-noir.vercel.app/offres";
+    return a.offer_slug
+      ? `${base}/${a.offer_slug}?ref=${a.code}`
+      : `${base}?ref=${a.code}`;
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -100,6 +173,7 @@ export default function AdminAffiliates() {
         email: form.email,
         password: form.password,
         commissionRate: Number(form.commissionRate),
+        offerSlug: form.offerSlug || null,
       }),
     });
     const data = await res.json();
@@ -119,9 +193,9 @@ export default function AdminAffiliates() {
     }
 
     setResult(
-      `Affilié créé ! Code : ${data.code} — transmets-lui son email, son mot de passe et le lien de connexion (${window.location.origin}/affilie).`
+      `Affilié créé ! Transmets-lui : email "${form.email}", mot de passe "${form.password}", et le lien de connexion (${window.location.origin}/affilie).`
     );
-    setForm({ name: "", phone: "", email: "", password: "", commissionRate: "20" });
+    setForm({ name: "", phone: "", email: "", password: "", commissionRate: "20", offerSlug: "" });
     load();
   }
 
@@ -195,13 +269,30 @@ export default function AdminAffiliates() {
           onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
           className="w-full rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm dark:border-white/15"
         />
+        <div className="flex gap-2">
+          <input
+            required
+            type="text"
+            placeholder="Mot de passe de connexion"
+            value={form.password}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, password: e.target.value }))
+            }
+            className="w-full rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm dark:border-white/15"
+          />
+          <button
+            type="button"
+            onClick={() => setForm((f) => ({ ...f, password: generatePassword() }))}
+            className="shrink-0 rounded-xl border border-black/10 px-3 py-2 text-xs font-semibold dark:border-white/15"
+          >
+            Générer
+          </button>
+        </div>
         <input
-          required
-          type="text"
-          placeholder="Mot de passe de connexion"
-          value={form.password}
+          placeholder="Slug du produit concerné (optionnel — vide = tout le catalogue)"
+          value={form.offerSlug}
           onChange={(e) =>
-            setForm((f) => ({ ...f, password: e.target.value }))
+            setForm((f) => ({ ...f, offerSlug: e.target.value }))
           }
           className="w-full rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm dark:border-white/15"
         />
@@ -233,7 +324,7 @@ export default function AdminAffiliates() {
               type="button"
               onClick={() => {
                 setPrefillRequestId(null);
-                setForm({ name: "", phone: "", email: "", password: "", commissionRate: "20" });
+                setForm({ name: "", phone: "", email: "", password: "", commissionRate: "20", offerSlug: "" });
               }}
               className="rounded-full border border-black/10 px-5 py-2 text-sm dark:border-white/15"
             >
@@ -250,18 +341,56 @@ export default function AdminAffiliates() {
         {affiliates.map((a) => (
           <div
             key={a.id}
-            className="rounded-2xl border border-black/10 p-4 dark:border-white/10"
+            className={`rounded-2xl border p-4 ${
+              a.active
+                ? "border-black/10 dark:border-white/10"
+                : "border-red-500/30 bg-red-500/5 opacity-70"
+            }`}
           >
-            <p className="font-semibold">{a.name}</p>
-            <p className="text-xs opacity-60">
-              Code : <span className="font-mono text-accent">{a.code}</span>{" "}
-              · Commission : {a.commission_rate}%
-              {a.phone ? ` · ${a.phone}` : ""}
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="font-semibold">
+                  {a.name}
+                  {!a.active && (
+                    <span className="ml-2 text-xs text-red-500">
+                      (suspendu)
+                    </span>
+                  )}
+                </p>
+                <p className="text-xs opacity-60">
+                  Code : <span className="font-mono text-accent">{a.code}</span>{" "}
+                  · Commission : {a.commission_rate}%
+                  {a.phone ? ` · ${a.phone}` : ""}
+                </p>
+              </div>
+              <button
+                onClick={() => toggleActive(a)}
+                className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-bold ${
+                  a.active
+                    ? "border border-black/10 dark:border-white/15"
+                    : "bg-accent/15 text-accent"
+                }`}
+              >
+                {a.active ? "Suspendre" : "Réactiver"}
+              </button>
+            </div>
+            <p className="mt-2 text-sm font-semibold text-gold">
+              {(salesTotals[a.code] || 0).toLocaleString("fr-FR")} CFA de
+              commissions générées
             </p>
             <p className="mt-1 break-all text-xs opacity-50">
-              Lien : https://empire-chapeau-noir.vercel.app/offres?ref=
-              {a.code}
+              {linkFor(a)}
             </p>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(linkFor(a));
+                setCopiedId(a.id);
+                setTimeout(() => setCopiedId(null), 2000);
+              }}
+              className="mt-1 rounded-full border border-black/10 px-3 py-1 text-[11px] font-semibold dark:border-white/15"
+            >
+              {copiedId === a.id ? "Copié !" : "Copier le lien"}
+            </button>
           </div>
         ))}
         {!loading && affiliates.length === 0 && (
