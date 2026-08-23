@@ -11,6 +11,8 @@ type OrderRequest = {
   offer_requested: string | null;
   message: string | null;
   status: string;
+  sale_confirmed: boolean;
+  referral_code: string | null;
   created_at: string;
 };
 
@@ -49,6 +51,14 @@ export default function AdminRequests() {
     load();
   }
 
+  async function toggleSale(item: OrderRequest) {
+    await supabase
+      .from("order_requests")
+      .update({ sale_confirmed: !item.sale_confirmed })
+      .eq("id", item.id);
+    load();
+  }
+
   return (
     <div>
       <div className="mb-4 flex gap-2">
@@ -82,17 +92,37 @@ export default function AdminRequests() {
                   {item.email ? ` · ${item.email}` : ""}
                 </p>
               </div>
-              <button
-                onClick={() => toggleStatus(item)}
-                className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-bold uppercase ${
-                  item.status === "traité"
-                    ? "bg-accent/15 text-accent"
-                    : "bg-gold/15 text-gold"
-                }`}
-              >
-                {item.status === "traité" ? "Traité ✓" : "Marquer traité"}
-              </button>
+              <div className="flex shrink-0 flex-col gap-1.5">
+                <button
+                  onClick={() => toggleStatus(item)}
+                  className={`rounded-full px-3 py-1 text-[11px] font-bold uppercase ${
+                    item.status === "traité"
+                      ? "bg-accent/15 text-accent"
+                      : "bg-gold/15 text-gold"
+                  }`}
+                >
+                  {item.status === "traité" ? "Traité ✓" : "Marquer traité"}
+                </button>
+                <button
+                  onClick={() => toggleSale(item)}
+                  className={`rounded-full px-3 py-1 text-[11px] font-bold uppercase ${
+                    item.sale_confirmed
+                      ? "bg-emerald-500/15 text-emerald-500"
+                      : "border border-black/10 dark:border-white/15"
+                  }`}
+                >
+                  {item.sale_confirmed ? "Vente confirmée ✓" : "Confirmer vente"}
+                </button>
+              </div>
             </div>
+            {item.referral_code && (
+              <p className="mt-2 text-xs">
+                <span className="opacity-60">Affilié :</span>{" "}
+                <span className="font-mono text-accent">
+                  {item.referral_code}
+                </span>
+              </p>
+            )}
             {item.offer_requested && (
               <p className="mt-2 text-sm">
                 <span className="opacity-60">Offre :</span>{" "}

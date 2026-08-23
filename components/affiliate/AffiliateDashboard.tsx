@@ -15,6 +15,7 @@ type OrderRequest = {
   full_name: string;
   offer_requested: string | null;
   status: string;
+  sale_confirmed: boolean;
   created_at: string;
 };
 
@@ -82,7 +83,8 @@ export default function AffiliateDashboard() {
   }
 
   const link = `https://empire-chapeau-noir.vercel.app/offres?ref=${affiliate.code}`;
-  const estimatedCommission = requests.reduce((sum, r) => {
+  const confirmedSales = requests.filter((r) => r.sale_confirmed);
+  const estimatedCommission = confirmedSales.reduce((sum, r) => {
     const price = r.offer_requested ? offerPrices[r.offer_requested] : 0;
     return sum + ((price || 0) * affiliate.commission_rate) / 100;
   }, 0);
@@ -118,7 +120,7 @@ export default function AffiliateDashboard() {
         </button>
       </div>
 
-      <div className="mt-6 grid grid-cols-3 gap-3 text-center">
+      <div className="mt-6 grid grid-cols-2 gap-3 text-center sm:grid-cols-4">
         <div className="rounded-2xl border border-black/10 p-4 dark:border-white/10">
           <p className="font-display text-xl font-bold text-accent">
             {clicksCount}
@@ -136,18 +138,26 @@ export default function AffiliateDashboard() {
           </p>
         </div>
         <div className="rounded-2xl border border-black/10 p-4 dark:border-white/10">
+          <p className="font-display text-xl font-bold text-emerald-500">
+            {confirmedSales.length}
+          </p>
+          <p className="text-[11px] uppercase tracking-wide opacity-60">
+            Ventes confirmées
+          </p>
+        </div>
+        <div className="rounded-2xl border border-black/10 p-4 dark:border-white/10">
           <p className="font-display text-xl font-bold text-gold">
             {estimatedCommission.toLocaleString("fr-FR")} CFA
           </p>
           <p className="text-[11px] uppercase tracking-wide opacity-60">
-            Commission est.
+            Commission
           </p>
         </div>
       </div>
 
       <p className="mt-3 text-xs opacity-50">
-        Taux de commission : {affiliate.commission_rate}% · Montant estimé,
-        confirmé après vérification de chaque vente par Samuel.
+        Taux de commission : {affiliate.commission_rate}% · Calculée
+        uniquement sur les ventes que Samuel a confirmées.
       </p>
 
       <div className="mt-8">
@@ -164,7 +174,11 @@ export default function AffiliateDashboard() {
               <p className="text-xs opacity-60">
                 {r.offer_requested || "Offre non précisée"} ·{" "}
                 {new Date(r.created_at).toLocaleDateString("fr-FR")} ·{" "}
-                {r.status === "traité" ? "Traité" : "En attente"}
+                {r.sale_confirmed ? (
+                  <span className="text-emerald-500">Vente confirmée</span>
+                ) : (
+                  "En attente"
+                )}
               </p>
             </div>
           ))}

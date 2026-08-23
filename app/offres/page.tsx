@@ -14,6 +14,7 @@ export const metadata: Metadata = {
 type Offer = {
   id: string;
   title: string;
+  slug: string;
   description: string | null;
   is_free: boolean;
   featured: boolean;
@@ -61,9 +62,11 @@ export default async function OffresPage() {
               {offer.is_free ? "Gratuit" : "Payant"}
             </span>
 
-            <h2 className="mt-4 font-display text-lg font-bold">
-              {offer.title}
-            </h2>
+            <Link href={`/offres/${offer.slug}`}>
+              <h2 className="mt-4 font-display text-lg font-bold hover:text-accent">
+                {offer.title}
+              </h2>
+            </Link>
             <p className="mt-2 flex-1 text-sm opacity-75">
               {offer.description}
             </p>
