@@ -1,6 +1,6 @@
 import { supabase } from "../lib/supabase";
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export default async function TestimonialStrip() {
   const { data } = await supabase
@@ -19,6 +19,9 @@ export default async function TestimonialStrip() {
           key={t.id}
           className="relative flex h-72 w-48 shrink-0 snap-start flex-col overflow-hidden rounded-2xl border border-black/10 shadow-sm dark:border-white/10"
         >
+          <span className="absolute left-2 top-2 z-10 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-bold text-white">
+            ✓ Vérifié
+          </span>
           {t.image_url && (
             // eslint-disable-next-line @next/next/no-img-element
             <img

@@ -14,6 +14,7 @@ type Offer = {
   position: number | null;
   views: number | null;
   price: number | null;
+  deadline: string | null;
 };
 
 const emptyForm = {
@@ -21,6 +22,7 @@ const emptyForm = {
   description: "",
   category: "",
   price: "",
+  deadline: "",
   is_free: false,
   featured: false,
 };
@@ -68,6 +70,7 @@ export default function AdminOffers() {
       description: form.description,
       category: form.category,
       price: form.price ? Number(form.price) : null,
+      deadline: form.deadline ? new Date(form.deadline).toISOString() : null,
       is_free: form.is_free,
       featured: form.featured,
     };
@@ -94,6 +97,9 @@ export default function AdminOffers() {
       description: offer.description || "",
       category: offer.category || "",
       price: offer.price ? String(offer.price) : "",
+      deadline: offer.deadline
+        ? new Date(offer.deadline).toISOString().slice(0, 16)
+        : "",
       is_free: offer.is_free,
       featured: offer.featured,
     });
@@ -156,6 +162,20 @@ export default function AdminOffers() {
           onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
           className="w-full rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm dark:border-white/15"
         />
+        <div>
+          <label className="mb-1 block text-xs opacity-60">
+            Date limite de l&apos;offre (optionnel — active un compte à
+            rebours)
+          </label>
+          <input
+            type="datetime-local"
+            value={form.deadline}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, deadline: e.target.value }))
+            }
+            className="w-full rounded-xl border border-black/10 bg-transparent px-3 py-2 text-sm dark:border-white/15"
+          />
+        </div>
         <input
           type="file"
           accept="image/*"

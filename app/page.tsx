@@ -4,7 +4,7 @@ import TestimonialStrip from "../components/TestimonialStrip";
 import OfferCta from "../components/OfferCta";
 import { supabase } from "../lib/supabase";
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Empire Chapeau Noir — Formation & création de contenu",

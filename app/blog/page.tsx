@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { supabase } from "../../lib/supabase";
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Blog",

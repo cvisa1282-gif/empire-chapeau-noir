@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import OfferCta from "../../components/OfferCta";
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Offres & Services",
@@ -18,13 +18,26 @@ type Offer = {
   description: string | null;
   is_free: boolean;
   featured: boolean;
+  created_at: string;
 };
 
+function isNew(createdAt: string) {
+  const diffDays =
+    (Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24);
+  return diffDays <= 7;
+}
+
 export default async function OffresPage() {
-  const { data } = await supabase
-    .from("offers")
-    .select("*")
-    .order("position", { ascending: true, nullsFirst: false });
+  const [{ data }, { count: affiliateCount }] = await Promise.all([
+    supabase
+      .from("offers")
+      .select("*")
+      .order("position", { ascending: true, nullsFirst: false }),
+    supabase
+      .from("affiliates")
+      .select("*", { count: "exact", head: true })
+      .eq("active", true),
+  ]);
 
   const offers = (data as Offer[]) || [];
 
@@ -40,6 +53,12 @@ export default async function OffresPage() {
         Formations, accompagnement et création de contenu — pour commander,
         remplis simplement le formulaire de contact.
       </p>
+      {!!affiliateCount && affiliateCount > 0 && (
+        <p className="mt-2 text-xs font-semibold text-gold">
+          {affiliateCount} affilié{affiliateCount > 1 ? "s" : ""} actif
+          {affiliateCount > 1 ? "s" : ""} nous font confiance
+        </p>
+      )}
 
       <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {offers.map((offer) => (
@@ -47,20 +66,27 @@ export default async function OffresPage() {
             key={offer.id}
             className="relative flex flex-col rounded-2xl border border-black/10 p-6 dark:border-white/10"
           >
-            {offer.featured && (
-              <span className="seal absolute -top-3 left-5 bg-paper-50 text-[10px] font-bold uppercase tracking-wide text-gold dark:bg-base-950">
-                Offre phare
+            <div className="flex flex-wrap gap-2">
+              {offer.featured && (
+                <span className="seal absolute -top-3 left-5 bg-paper-50 text-[10px] font-bold uppercase tracking-wide text-gold dark:bg-base-950">
+                  Offre phare
+                </span>
+              )}
+              <span
+                className={`w-fit rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide ${
+                  offer.is_free
+                    ? "bg-accent/15 text-accent"
+                    : "bg-gold/15 text-gold"
+                }`}
+              >
+                {offer.is_free ? "Gratuit" : "Payant"}
               </span>
-            )}
-            <span
-              className={`w-fit rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide ${
-                offer.is_free
-                  ? "bg-accent/15 text-accent"
-                  : "bg-gold/15 text-gold"
-              }`}
-            >
-              {offer.is_free ? "Gratuit" : "Payant"}
-            </span>
+              {isNew(offer.created_at) && (
+                <span className="w-fit rounded-full bg-ember/15 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-ember">
+                  Nouveau
+                </span>
+              )}
+            </div>
 
             <Link href={`/offres/${offer.slug}`}>
               <h2 className="mt-4 font-display text-lg font-bold hover:text-accent">

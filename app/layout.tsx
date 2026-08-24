@@ -7,6 +7,7 @@ import Footer from "../components/Footer";
 import WhatsAppButton from "../components/WhatsAppButton";
 import CookieBanner from "../components/CookieBanner";
 import BackButton from "../components/BackButton";
+import BackToTop from "../components/BackToTop";
 import ReferralTracker from "../components/ReferralTracker";
 
 const display = Playfair_Display({
@@ -57,6 +58,7 @@ export default function RootLayout({
         <main>{children}</main>
         <Footer />
         <WhatsAppButton />
+        <BackToTop />
         <CookieBanner />
       </body>
     </html>

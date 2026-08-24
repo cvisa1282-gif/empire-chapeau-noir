@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { supabase } from "../../../lib/supabase";
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 async function getPost(slug: string) {
   const { data } = await supabase

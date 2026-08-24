@@ -3,8 +3,10 @@ import type { Metadata } from "next";
 import { supabase } from "../../../lib/supabase";
 import OfferCta from "../../../components/OfferCta";
 import AffiliateRequestForm from "../../../components/AffiliateRequestForm";
+import OfferCountdown from "../../../components/OfferCountdown";
+import FavoriteButton from "../../../components/FavoriteButton";
 
-export const revalidate = 0;
+export const revalidate = 60;
 
 async function getOffer(slug: string) {
   const { data } = await supabase
@@ -13,6 +15,12 @@ async function getOffer(slug: string) {
     .eq("slug", slug)
     .maybeSingle();
   return data;
+}
+
+function isNew(createdAt: string) {
+  const diffDays =
+    (Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24);
+  return diffDays <= 7;
 }
 
 export async function generateMetadata({
@@ -52,15 +60,22 @@ export default async function OfferDetailPage({
         />
       )}
 
-      <span
-        className={`w-fit rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide ${
-          offer.is_free
-            ? "bg-accent/15 text-accent"
-            : "bg-gold/15 text-gold"
-        }`}
-      >
-        {offer.is_free ? "Gratuit" : "Payant"}
-      </span>
+      <div className="flex flex-wrap gap-2">
+        <span
+          className={`w-fit rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide ${
+            offer.is_free
+              ? "bg-accent/15 text-accent"
+              : "bg-gold/15 text-gold"
+          }`}
+        >
+          {offer.is_free ? "Gratuit" : "Payant"}
+        </span>
+        {isNew(offer.created_at) && (
+          <span className="w-fit rounded-full bg-ember/15 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-ember">
+            Nouveau
+          </span>
+        )}
+      </div>
 
       <h1 className="mt-4 font-display text-3xl font-extrabold md:text-4xl">
         {offer.title}
@@ -75,13 +90,22 @@ export default async function OfferDetailPage({
         </p>
       )}
 
-      <OfferCta
-        offerId={offer.id}
-        href={`/contact?offre=${encodeURIComponent(offer.title)}`}
-        className="mt-6 inline-block rounded-full bg-accent px-6 py-3 text-sm font-bold text-white"
-      >
-        {offer.is_free ? "Recevoir gratuitement" : "Commander"}
-      </OfferCta>
+      {offer.deadline && <OfferCountdown deadline={offer.deadline} />}
+
+      <div className="mt-6 flex flex-wrap gap-3">
+        <OfferCta
+          offerId={offer.id}
+          href={`/contact?offre=${encodeURIComponent(offer.title)}`}
+          className="inline-block rounded-full bg-accent px-6 py-3 text-sm font-bold text-white"
+        >
+          {offer.is_free ? "Recevoir gratuitement" : "Commander"}
+        </OfferCta>
+        <FavoriteButton
+          offerId={offer.id}
+          offerTitle={offer.title}
+          offerSlug={offer.slug}
+        />
+      </div>
 
       <div className="mt-4">
         <AffiliateRequestForm offerTitle={offer.title} />
